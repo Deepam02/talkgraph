@@ -37,6 +37,16 @@ export interface Caption {
   at: number;
 }
 
+export interface Activity {
+  id: number;
+  at: number;
+  source: EditSource;
+  tool: string;
+  args: string;
+  ok: boolean;
+  message: string;
+}
+
 export type ExportFormat = "terraform" | "mermaid" | "adr";
 export type PanelTab = "inspect" | "review" | "simulate" | "history";
 
@@ -54,6 +64,8 @@ interface StudioState {
   chaos: boolean;
   voice: { status: AgentStatus; configured: boolean | null; error: string | null; captions: Caption[]; sessionEndsAt: number | null };
   saveState: "idle" | "saving" | "saved" | "error";
+  /** Tool calls as they happen: the agent's work, made visible. */
+  activity: Activity[];
 
   // edits
   commit(commands: Command[], source: EditSource, label?: string): CommitInfo | null;
@@ -83,6 +95,7 @@ interface StudioState {
 }
 
 let toastSeq = 0;
+let activitySeq = 0;
 const engine = new GraphEngine();
 const runner = new CommandRunner(engine);
 
@@ -147,6 +160,7 @@ export const useStudio = create<StudioState>((set, get) => {
     chaos: false,
     voice: { status: "idle", configured: null, error: null, captions: [], sessionEndsAt: null },
     saveState: "idle",
+    activity: [],
 
     commit(commands, source, label) {
       try {
@@ -163,6 +177,8 @@ export const useStudio = create<StudioState>((set, get) => {
 
     runTool(name, args, source) {
       const o = executeTool(engine, name, args, source);
+      const entry: Activity = { id: ++activitySeq, at: Date.now(), source, tool: name, args: JSON.stringify(args ?? {}), ok: o.ok, message: o.message };
+      set((s) => ({ activity: [entry, ...s.activity].slice(0, 40) }));
       // Voice outcomes: toasts for errors/info; commits already toast via the subscription.
       if (source !== "voice") toastOutcome(o, () => get().runTool(name, { ...(args as object), confirmed: true }, source));
       else {
@@ -178,6 +194,8 @@ export const useStudio = create<StudioState>((set, get) => {
         if (s.parseError) get().pushToast({ kind: "error", source: "command", title: s.parseError });
         else if (s.outcome) {
           const call = s.call!;
+          const entry: Activity = { id: ++activitySeq, at: Date.now(), source: "command", tool: call.name, args: JSON.stringify(call.arguments), ok: s.outcome.ok, message: s.outcome.message };
+          set((st) => ({ activity: [entry, ...st.activity].slice(0, 40) }));
           toastOutcome(s.outcome, () => get().runTool(call.name, { ...call.arguments, confirmed: true }, "command"));
         }
       }

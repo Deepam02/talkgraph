@@ -337,4 +337,7 @@ kbd {
     break-after: page;
     background: linear-gradient(135deg, var(--canvas-a), var(--canvas-b));
   }
+  .deck-print-page:last-child {
+    break-after: auto;
+  }
 }

@@ -152,6 +152,7 @@ export function VoiceDock() {
             <span className="font-semibold text-indigo">{f.fix!.label}</span>
           </button>
         ))}
+        {!fixChips.length && !failing && <span className="self-center text-[12px] text-ink-faint">Try saying</span>}
         {!fixChips.length &&
           !failing &&
           starters.map((s) => (

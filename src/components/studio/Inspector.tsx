@@ -494,6 +494,29 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: str
 
 // ── History ──────────────────────────────────────────────────────────────
 
+function ActivityFeed() {
+  const activity = useStudio((s) => s.activity);
+  if (!activity.length) return null;
+  return (
+    <>
+      <Label>Agent activity</Label>
+      <ol className="space-y-1.5">
+        {activity.slice(0, 12).map((a) => (
+          <li key={a.id} className="rounded-xl border border-ink/8 bg-white/45 px-2.5 py-2">
+            <div className="flex items-center gap-1.5">
+              <span className="size-1.5 shrink-0 rounded-full" style={{ background: a.ok ? "#5B6CFF" : "#F43F5E" }} />
+              <code className="font-mono text-[11.5px] font-semibold text-ink">{a.tool}</code>
+              <span className="ml-auto text-[10.5px] text-ink-faint">{a.source === "voice" ? "voice" : a.source === "command" ? "typed" : a.source}</span>
+            </div>
+            <div className="mt-0.5 break-all font-mono text-[10.5px] leading-snug text-ink-faint">{a.args.length > 140 ? `${a.args.slice(0, 140)}…` : a.args}</div>
+            <div className={`mt-0.5 text-[11.5px] leading-snug ${a.ok ? "text-ink-soft" : "text-rose"}`}>{a.message}</div>
+          </li>
+        ))}
+      </ol>
+    </>
+  );
+}
+
 function HistoryTab({ versions, onSaveVersion, onRestore }: { versions: VersionRecord[]; onSaveVersion(): void; onRestore(v: VersionRecord): void }) {
   const past = useStudio((s) => s.snap.past);
   const future = useStudio((s) => s.snap.future);
@@ -505,6 +528,7 @@ function HistoryTab({ versions, onSaveVersion, onRestore }: { versions: VersionR
   };
   return (
     <div className="pt-2">
+      <ActivityFeed />
       <div className="flex items-center justify-between">
         <Label>Versions</Label>
         <button type="button" className="btn !h-8 !px-2.5 !text-[12px] text-indigo" onClick={onSaveVersion}>

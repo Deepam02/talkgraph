@@ -64,6 +64,8 @@ Open `/bench`. Click **Run against the live agent** (it takes a minute; start it
 
 > Narration: "We measure it. Each scenario is something people actually say, scored against the resulting graph, not the agent's wording. The same scenarios run in CI through a deterministic parser, and live against the AssemblyAI Voice Agent."
 
+Back on the canvas, open the **History** tab: **Agent activity** lists every tool call the agent made during the recording, with its arguments and result.
+
 Show the README section "How the voice agent works" for five seconds: server-minted token, one WebSocket, tool results sent on `reply.done`, live graph pushed into the system prompt, keyterms from the catalog, clean `session.end`.
 
 ## 4:05–4:30 · Close

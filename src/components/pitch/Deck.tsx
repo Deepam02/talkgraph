@@ -35,8 +35,8 @@ function Points({ items }: { items: [string, string][] }) {
   );
 }
 
-export function Deck({ stats }: { stats: Stats }) {
-  const slides: ReactNode[] = [
+function buildSlides(stats: Stats, print: boolean): ReactNode[] {
+  return [
     <Slide key="title" className="justify-between">
       <Wordmark size={34} />
       <div>
@@ -67,7 +67,12 @@ export function Deck({ stats }: { stats: Stats }) {
       </div>
       <div className="glass relative flex-1 overflow-hidden rounded-[26px]">
         <div aria-hidden className="dot-grid absolute inset-0 opacity-70" />
-        <HeroDemo />
+        {print ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src="/pitch-demo.jpg" alt="" className="absolute inset-0 h-full w-full object-cover object-top" />
+        ) : (
+          <HeroDemo />
+        )}
       </div>
     </Slide>,
 
@@ -139,19 +144,12 @@ export function Deck({ stats }: { stats: Stats }) {
       <p className="mt-5 text-[clamp(1rem,1.5vw,1.3rem)] text-ink-soft">{PRODUCT.url.replace(/^https?:\/\//, "")}</p>
     </Slide>,
   ];
+}
 
+export function Deck({ stats }: { stats: Stats }) {
+  const slides = buildSlides(stats, false);
+  const printSlides = buildSlides(stats, true);
   const [i, setI] = useState(0);
-  const [printing, setPrinting] = useState(false);
-  useEffect(() => {
-    const on = () => setPrinting(true);
-    const off = () => setPrinting(false);
-    window.addEventListener("beforeprint", on);
-    window.addEventListener("afterprint", off);
-    return () => {
-      window.removeEventListener("beforeprint", on);
-      window.removeEventListener("afterprint", off);
-    };
-  }, []);
   const go = useCallback((d: number) => setI((x) => Math.max(0, Math.min(slides.length - 1, x + d))), [slides.length]);
 
   useEffect(() => {
@@ -188,15 +186,13 @@ export function Deck({ stats }: { stats: Stats }) {
         </button>
       </div>
       {/* Print: every slide on its own landscape page. */}
-      {printing && (
       <div className="hidden print:block">
-        {slides.map((s, k) => (
+        {printSlides.map((s, k) => (
           <div key={k} className="deck-print-page">
             {s}
           </div>
         ))}
       </div>
-      )}
     </div>
   );
 }

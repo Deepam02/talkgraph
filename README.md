@@ -12,7 +12,12 @@ TalkGraph is a voice-controlled system architecture canvas. Describe a system ou
 - **It infers sensible defaults.** Names ("orders-db"), protocols (gRPC, SQL, RESP), placement, and obvious wiring are inferred and badged, with a one-tap undo.
 - **It's a model, not a picture.** A live linter flags single points of failure, missing caches and queues, and plaintext links. Traffic simulation and chaos mode show overloads and cascading failure; "fix it" applies validated remedies.
 - **It ships.** Terraform skeleton, Mermaid, and an ADR, all generated from the same typed graph.
+- **It shows its work.** An agent activity feed lists every tool call with its arguments and result, and every edit gets a toast with one-tap undo.
 - **It's measured.** A benchmark of spoken scenarios is scored against the resulting graph: offline in CI, and live against the AssemblyAI Voice Agent.
+
+| 10x traffic: overloaded services glow rose | After "fix it": caches, scaling, a paced queue, 0% errors |
+| - | - |
+| ![Overloaded](docs/screenshot-overload.jpg) | ![Healed](docs/screenshot-healed.jpg) |
 
 Built for the [AssemblyAI Voice Agent Hackathon](https://lablab.ai/ai-hackathons/assemblyai-voice-agent-hackathon).
 
